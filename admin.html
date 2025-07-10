@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="nl">
+<meta charset="utf-8">
+<title>Bezoekersteller admin</title>
+<style>
+  body{font-family:sans-serif;margin:2rem;background:#f7f7f7;color:#222}
+  button{padding:.6rem 1.2rem;font-size:1rem;border:0;border-radius:4px;
+         background:#0066d6;color:#fff;cursor:pointer}
+  pre{background:#eee;padding:1rem;border-radius:4px;overflow:auto}
+</style>
+
+<h1>Statistiek – Max-site</h1>
+<p>
+  Totaal bezoekers: <strong id="total">laden…</strong><br>
+  <button id="csv">Download CSV</button>
+</p>
+
+<details>
+  <summary>JSON-dump (debug)</summary>
+  <pre id="dump"></pre>
+</details>
+
+<script>
+const NS = "edwinver.github.io/max";   // ⬅︎ gebruik exact dezelfde namespace
+const STATS_URL = `https://api.countapi.xyz/stats/${NS}`;
+const TOTAL_URL = `https://api.countapi.xyz/get/${NS}/total`;
+
+/* 1) toon teller */
+fetch(TOTAL_URL)
+  .then(r => r.json())
+  .then(j => document.getElementById('total').textContent =
+        (j.value ?? 0).toLocaleString('nl-NL'))
+  .catch(() => document.getElementById('total').textContent = 'n.v.t.');
+
+/* 2) download-knop → CSV */
+document.getElementById('csv').addEventListener('click', async () => {
+  const json = await fetch(STATS_URL).then(r => r.json());
+  const csv  = "Key,Value\r\n" +
+               Object.entries(json.keys)
+                     .map(([k,v]) => `${k},${v}`)
+                     .join("\r\n");
+
+  const blob = new Blob([csv], {type:"text/csv"});
+  const link = Object.assign(document.createElement('a'), {
+              href: URL.createObjectURL(blob),
+              download: 'bezoekersteller.csv'
+            });
+  link.click();
+});
+
+/* 3) debug-output (optioneel) */
+fetch(STATS_URL).then(r=>r.json())
+  .then(j => document.getElementById('dump').textContent =
+        JSON.stringify(j, null, 2));
+</script>
+</html>

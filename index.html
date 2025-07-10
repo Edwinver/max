@@ -3,20 +3,17 @@
 <meta charset="utf-8">
 <title>Heeft Max al getekend?</title>
 <style>
-  body{margin:0;height:100vh;display:flex;align-items:center;
-       justify-content:center;background:#111;color:#fff;
-       font-family:sans-serif}
-  h1{font-size:10vw;margin:0}
+  body{margin:0;height:100vh;display:flex;align-items:center;justify-content:center;
+       background:#111;color:#fff;font-family:sans-serif}
+  h1{font-size:9vw;margin:0}
 </style>
 
 <h1>NEE</h1>
 
 <script>
-/* --- teller onder water --- */
-const NAMESPACE = "edwinver.github.io/max";   // ↩︎ wijzig in iets unieks
-const KEY       = "total";
-
-fetch(`https://api.countapi.xyz/hit/${NAMESPACE}/${KEY}`)
-  .catch(console.error);   // we negeren de response: alleen tellen
+/* ── tellertje onder water ───────────────────────────── */
+const NS  = "edwinver.github.io/max";  // ⬅︎ verander in eigen namespace
+const URL = `https://api.countapi.xyz/hit/${NS}/total`;
+fetch(URL).catch(console.error);       // geen UI-reactie nodig
 </script>
 </html>

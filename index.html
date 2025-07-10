@@ -1,36 +1,56 @@
 <!DOCTYPE html>
 <html lang="nl">
 <meta charset="utf-8">
-<title>Heeft Max al…?</title>
+<title>Heeft Max al getekend?</title>
 <style>
   body{margin:0;height:100vh;display:flex;flex-direction:column;
        justify-content:center;align-items:center;background:#111;color:#fff;
        font-family:sans-serif;text-align:center}
   h1{font-size:10vw;margin:0}
-  p{font-size:1.2rem;color:#bbb;margin:.5em}
+  p,button{font-size:1.1rem;color:#bbb}
+  button{margin-top:1.5rem;padding:.6rem 1.2rem;
+         background:#444;border:0;border-radius:4px;color:#fff;cursor:pointer}
+  button:hover{background:#666}
 </style>
 
 <h1 id="answer">NEE</h1>
 
 <p>
-  Bezoekers uit <span id="country">...</span>: 
-  <strong id="counter">…</strong>
+  Bezoekers in totaal: <strong id="counter">…</strong>
 </p>
 
+<button id="download">Exporteer naar Excel (CSV)</button>
+
 <script>
-/* ---- teller + land ---- */
+/* CONFIG – gebruik je eigen namespace! */
+const NAMESPACE = "edwinver.github.io/max";
+const KEY       = "total";
+
+/* 1) teller +1 en toon waarde */
 (async () => {
-  /* 1) land bepalen */
-  const ip = await fetch('https://ipapi.co/json').then(r => r.json());
-  const code = ip.country_code || 'XX';      // fallback
-  const name = ip.country_name || 'onbekend';
-  document.getElementById('country').textContent = name;
-
-  /* 2) teller ophogen voor dit land */
-  const api = `https://api.countapi.xyz/hit/edwinver.github.io/max/${code}`;
-  const cnt = await fetch(api).then(r => r.json());
-
-  document.getElementById('counter').textContent = cnt.value.toLocaleString('nl-NL');
+  const hitURL = `https://api.countapi.xyz/hit/${NAMESPACE}/${KEY}`;
+  const data   = await fetch(hitURL).then(r => r.json());
+  document.getElementById("counter").textContent =
+      data.value.toLocaleString("nl-NL");
 })();
+
+/* 2) CSV-download */
+document.getElementById("download").addEventListener("click", async () => {
+  const statsURL = `https://api.countapi.xyz/stats/${NAMESPACE}`;
+  const json     = await fetch(statsURL).then(r => r.json());
+
+  /* maak één-regel CSV: key,value */
+  const csv = "Key,Value\r\n" +
+              Object.entries(json.keys)
+                    .map(([k,v]) => `${k},${v}`)
+                    .join("\r\n");
+
+  const blob = new Blob([csv], {type: "text/csv"});
+  const a    = Object.assign(document.createElement("a"), {
+                href: URL.createObjectURL(blob),
+                download: "bezoekersteller.csv"
+              });
+  a.click();
+});
 </script>
 </html>

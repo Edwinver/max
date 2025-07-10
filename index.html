@@ -3,54 +3,20 @@
 <meta charset="utf-8">
 <title>Heeft Max al getekend?</title>
 <style>
-  body{margin:0;height:100vh;display:flex;flex-direction:column;
-       justify-content:center;align-items:center;background:#111;color:#fff;
-       font-family:sans-serif;text-align:center}
+  body{margin:0;height:100vh;display:flex;align-items:center;
+       justify-content:center;background:#111;color:#fff;
+       font-family:sans-serif}
   h1{font-size:10vw;margin:0}
-  p,button{font-size:1.1rem;color:#bbb}
-  button{margin-top:1.5rem;padding:.6rem 1.2rem;
-         background:#444;border:0;border-radius:4px;color:#fff;cursor:pointer}
-  button:hover{background:#666}
 </style>
 
-<h1 id="answer">NEE</h1>
-
-<p>
-  Bezoekers in totaal: <strong id="counter">…</strong>
-</p>
-
-<button id="download">Exporteer naar Excel (CSV)</button>
+<h1>NEE</h1>
 
 <script>
-/* CONFIG – gebruik je eigen namespace! */
-const NAMESPACE = "edwinver.github.io/max";
+/* --- teller onder water --- */
+const NAMESPACE = "jouwdomein.nl/max";   // ↩︎ wijzig in iets unieks
 const KEY       = "total";
 
-/* 1) teller +1 en toon waarde */
-(async () => {
-  const hitURL = `https://api.countapi.xyz/hit/${NAMESPACE}/${KEY}`;
-  const data   = await fetch(hitURL).then(r => r.json());
-  document.getElementById("counter").textContent =
-      data.value.toLocaleString("nl-NL");
-})();
-
-/* 2) CSV-download */
-document.getElementById("download").addEventListener("click", async () => {
-  const statsURL = `https://api.countapi.xyz/stats/${NAMESPACE}`;
-  const json     = await fetch(statsURL).then(r => r.json());
-
-  /* maak één-regel CSV: key,value */
-  const csv = "Key,Value\r\n" +
-              Object.entries(json.keys)
-                    .map(([k,v]) => `${k},${v}`)
-                    .join("\r\n");
-
-  const blob = new Blob([csv], {type: "text/csv"});
-  const a    = Object.assign(document.createElement("a"), {
-                href: URL.createObjectURL(blob),
-                download: "bezoekersteller.csv"
-              });
-  a.click();
-});
+fetch(`https://api.countapi.xyz/hit/${NAMESPACE}/${KEY}`)
+  .catch(console.error);   // we negeren de response: alleen tellen
 </script>
 </html>
